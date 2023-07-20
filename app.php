@@ -40,41 +40,46 @@ $app->register('calculate-due-date')
             throw new \RuntimeException(\sprintf('Missing or invalid configuration file: %s', $e->getMessage()));
         }
 
-        $configuration = new WorkdaysConfiguration($workdays['working_hours']);
+        try {
+            $configuration = new WorkdaysConfiguration($workdays['working_hours']??[]);
 
-        $issueDate = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $input->getArgument('issue-date').' '.$input->getArgument('issue-time'));
-        if (false === $issueDate) {
-            throw new \InvalidArgumentException('Invalid arguments: issue-date, issue-time');
-        }
-
-        $issue = new Issue($issueDate, (int)$input->getArgument('lead-time'));
-
-        $issueValidator = new IssueValidator($configuration);
-
-        if (!$issueValidator->dateIsValid($issue)) {
-            if (!$configuration->isWorkingDay($issue->getDate())) {
-                $output->writeln(\sprintf('<error>Given date "%s" is not a working day.</error>', $issue->getDate()->format('Y-m-d')));
-            } else {
-                $workingDay = $configuration->getWorkingDay($issue->getDate());
-                $output->writeln(\sprintf('<error>Given time is out of working hours. Working hours are %s-%s.</error>',
-                    $workingDay->getStart()->format('H:i'),
-                    $workingDay->getEnd()->format('H:i')
-                ));
+            $issueDate = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $input->getArgument('issue-date') . ' ' . $input->getArgument('issue-time'));
+            if (false === $issueDate) {
+                throw new \InvalidArgumentException('Invalid arguments: issue-date, issue-time');
             }
 
-            return 1;
+            $issue = new Issue($issueDate, (int)$input->getArgument('lead-time'));
+
+            $issueValidator = new IssueValidator($configuration);
+
+            if (!$issueValidator->dateIsValid($issue)) {
+                if (!$configuration->isWorkingDay($issue->getDate())) {
+                    $output->writeln(\sprintf('<error>Given date "%s" is not a working day.</error>', $issue->getDate()->format('Y-m-d')));
+                } else {
+                    $workingDay = $configuration->getWorkingDay($issue->getDate());
+                    $output->writeln(\sprintf('<error>Given time is out of working hours. Working hours are %s-%s.</error>',
+                        $workingDay->getStart()->format('H:i'),
+                        $workingDay->getEnd()->format('H:i')
+                    ));
+                }
+
+                return 1;
+            }
+
+            $calculator = new DueDateCalculator($configuration);
+
+            $dueDate = $calculator->calculateDueDate($issue);
+
+            $output->writeln('');
+            $output->writeln(\sprintf('<comment>Issue recorded at:</comment> %s', $issueDate->format('Y-m-d H:i')));
+            $output->writeln(\sprintf('<comment>Lead time in hours:</comment> %d', $issue->getLeadTimeInHours()));
+            $output->writeln(\sprintf('<info>Calculated due date:</info> %s', $dueDate->format('Y-m-d H:i')));
+
+            return 0;
+        } catch (\Throwable $e) {
+            $output->writeln(\sprintf('<error>%s: %s</error>', \get_class($e), $e->getMessage()));
         }
-
-        $calculator = new DueDateCalculator($configuration);
-
-        $dueDate = $calculator->calculateDueDate($issue);
-
-        $output->writeln('');
-        $output->writeln(\sprintf('<comment>Issue recorded at:</comment> %s', $issueDate->format('Y-m-d H:i')));
-        $output->writeln(\sprintf('<comment>Lead time in hours:</comment> %d', $issue->getLeadTimeInHours()));
-        $output->writeln(\sprintf('<info>Calculated due date:</info> %s', $dueDate->format('Y-m-d H:i')));
-
-        return 0;
+        return 1;
     })
 ;
 
