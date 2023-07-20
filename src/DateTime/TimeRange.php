@@ -23,12 +23,12 @@ final class TimeRange implements TimeInterval
     /**
      * Convenience method to instantiate new TimeRange object.
      */
-    public static function create($start = self::MIN_VALUE, $end = self::MAX_VALUE)
+    public static function create($start = self::MIN_VALUE, $end = self::MAX_VALUE): self
     {
         return new self($start, $end);
     }
 
-    public static function createMoment(\DateTimeInterface $time = null)
+    public static function createMoment(\DateTimeInterface $time = null): self
     {
         if (null === $time) {
             $time = self::createDateTimeImmutable($time);
