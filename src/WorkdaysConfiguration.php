@@ -40,9 +40,6 @@ class WorkdaysConfiguration
         );
     }
 
-    /**
-     * @return int Zero based index, week begins with Monday (eg. 0=Monday, 1=Thuesday, and so on...)
-     */
     public function getNextWorkingDay(\DateTimeInterface $date): TimeRange
     {
         $day = $nextDay = $date->format('N')-1;
