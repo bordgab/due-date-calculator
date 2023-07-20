@@ -42,7 +42,6 @@ $app->register('calculate-due-date')
 
         $configuration = new WorkdaysConfiguration($workdays['working_hours']);
 
-
         $issueDate = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $input->getArgument('issue-date').' '.$input->getArgument('issue-time'));
         if (false === $issueDate) {
             throw new \InvalidArgumentException('Invalid arguments: issue-date, issue-time');
