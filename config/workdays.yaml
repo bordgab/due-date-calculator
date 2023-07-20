@@ -1,0 +1,8 @@
+working_hours:
+  - [ '9:00', '17:00' ] # Monday
+  - [ '9:00', '17:00' ] # Thuesday
+  - [ '9:00', '17:00' ] # Wednesday
+  - [ '9:00', '17:00' ] # Thursday
+  - [ '9:00', '17:00' ] # Friday
+  - [ null ] # Saturday
+  - [ null ] # Sunday

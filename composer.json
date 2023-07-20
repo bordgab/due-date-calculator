@@ -1,0 +1,19 @@
+{
+  "name": "bordacs/due-date-calculator",
+  "description": "Due date calculator",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Bordács Gábor",
+      "email": "bordgab@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": { "App\\": "src/" }
+  },
+  "require": {
+    "symfony/console": "^6.0",
+    "symfony/yaml": "^6.3"
+  }
+}
